@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wordpress_pvc
+  name: mysql-pvc
   labels:
     app: wordpress
-    tier: wordpress
+    tier: mysql
 spec:
   accessModes:
     - ReadWriteOnce
