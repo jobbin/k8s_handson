@@ -1,71 +1,62 @@
 # k8s_handson
 Handson of k8s.
 
-## RDSの作成
+## 【 Step 0 】RDSの作成
 
-## Container
+## 【 Step 1 】ローカルDBを利用したWordpressの構築
 
-### MySQL(local)の作成
+### ローカルDBの作成
 
-1. secret作成
+1. ローカルDB(MySQL)接続時の情報を保存するため、Secretを作成
 ```
 # kubectl create secret generic local-mysql-secret-info --from-literal=password=${Your local db password}
 ```
 
-1. あ
+1. MySQLのPVを作成する
 ```
 # kubectl apply -f mysql-pv.yml
 persistentvolume/mysql-pv created
 ```
 
-1. pvc作成
+1. MySQLのPVCを作成する
 ```
 # kubectl apply -f mysql-pvc.yml
 persistentvolumeclaim/mysql-pvc created
 ```
-1. mysql作成
+1. MySQLのDeploymentを作成する
 ```
 # kubectl apply -f mysql.yml
 deployment.extensions/mysql created
 ```
-1. service
+1. Wordpressからアクセスできるように、MySQLのServiceを作成する
 ```
 # kubectl apply -f mysql-service.yml
 service/mysql created
 ```
-1. 初確認
+1. MySQLの諸確認
 ```
 # kubectl get deploy,pv,pvc,svc
-NAME                          DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.extensions/mysql   1         1         1            1           3m
-NAME                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS    CLAIM               STORAGECLASS   REASON    AGE
-persistentvolume/mysql-pv   20Gi       RWO            Recycle          Bound     default/mysql-pvc                            8m
-NAME                              STATUS    VOLUME     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-persistentvolumeclaim/mysql-pvc   Bound     mysql-pv   20Gi       RWO                           7m
-NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-service/kubernetes   ClusterIP   172.19.0.1     <none>        443/TCP    1d
-service/mysql        ClusterIP   172.19.2.226   <none>        3306/TCP   38s
 ```
 
 ### Wordpressの作成
 
-1. a
+1. WordpressのPVを作成する
 ```
 # kubectl apply -f  wordpress-pv.yml
 ```
-1. a
+1. WordpressのPVCを作成する
 ```
 # kubectl apply -f  wordpress-pvc.yml
 ```
-1. a
+1. WordpressのDeploymentを作成する
 ```
 # kubectl apply -f  wordpress.yml
 ```
-1. a
+1. 外部からアクセスできるように、WordpressのServiceを作成する
 ```
 # kubectl apply -f  wordpress-service.yml
 ```
-1. a
+1. Wordpressの諸確認
 ```
 # kubectl get deploy,pv,pvc,svc
 ```
@@ -74,9 +65,9 @@ service/mysql        ClusterIP   172.19.2.226   <none>        3306/TCP   38s
 # kubectl get svc
 ```
 
-### RDS化
+### 【 Step 2 】ローカルDBからRDSへ切り替え
 
-1. Secretに保存する情報を設定する
+1. RDSの接続情報を設定する
 ```
 export SECRET_NAME=mysql-secret-info
 export DB_USER=wordpress
@@ -84,7 +75,7 @@ export DB_HOST={Your RDS intranet host}
 export DB_PASSWORD={Your DB password}
 ```
 
-1. Secretを作成する
+1. RDSの接続情報をSecretに保存する
 ```
 # kubectl create secret generic ${SECRET_NAME} \
 --from-literal=DB_USER=${DB_USER} \
@@ -92,39 +83,50 @@ export DB_PASSWORD={Your DB password}
 --from-literal=DB_PASSWORD=${DB_PASSWORD}
 ```
 
+1. WordpressのDeploymentを作り直す
+```
+kubectl apply -f wordpress.yml
+```
+
+1. WordpressのServiceを作り直す
+```
+kubectl apply -f wordpress-service.yml
+```
+
+1. 外部からアクセスしてみる
+
 ## Ingressを利用したBlue/Green Deployment
 
-1. a
+1. Blue環境のIngressを作成する
 ```
-# kubectl apply -f ingress_1.yml
+# kubectl apply -f ingress_blue.yml
 ```
 
-1. Address払い出されたら
+1. Blue環境へアクセスしてみる
 ```
 curl -H "Host:wordpress.io" {IP}
 ```
 
-1. a
+1. Green環境のNginxを作成する
 ```
 # kubectl create deployment nginx --image nginx
 deployment.apps/nginx created
 ```
 
-1. a
+1. Ingressからアクセスできるように、NginxのServiceを作成する
 ```
 # kubectl expose deployment nginx --type NodePort --port 80
 service/nginx exposed
 ```
 
-1. b
+1. Blue環境とGreen環境へのアクセスはそれぞれ50%にできるようなIngressを作成する
 ```
 # kubectl apply -f ingress-blue-green.yml
 ingress.extensions/ingress configured
 ```
 
-1. b
+1. Green環境へ切り替える
 ```
 # kubectl apply -f ingress-blue-green.yml
 ingress.extensions/ingress configured
 ```
-
