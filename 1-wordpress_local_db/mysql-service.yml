@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: local-mysql
   labels:
-    app: mysql
+    app: local-mysql
 spec:
   type: ClusterIP
   ports:
