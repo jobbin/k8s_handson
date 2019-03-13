@@ -102,6 +102,7 @@ kubectl apply -f wordpress-service.yml
 - 外部からアクセスしてみる
 
 ## Ingressを利用したBlue/Green Deployment
+- ディレクトリ 3-ingress_blue_green の配下に進む
 
 - Blue環境のIngressを作成する
 ```
@@ -132,7 +133,7 @@ service/nginx exposed
 
 - Blue環境とGreen環境へのアクセスはそれぞれ50%にできるようなIngressを更新する
 ```
-# kubectl apply -f ingress-blue-green.yml
+# kubectl apply -f ingress_blue_green.yml
 ingress.extensions/ingress configured
 ```
 
@@ -143,7 +144,7 @@ curl -H "Host:wordpress.io" {Ingress_IP}
 
 - Green環境へ切り替える
 ```
-# kubectl apply -f ingress-blue-green.yml
+# kubectl apply -f ingress_green.yml
 ingress.extensions/ingress configured
 ```
 
