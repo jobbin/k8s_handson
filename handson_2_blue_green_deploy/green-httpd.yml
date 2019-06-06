@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deployment-green
+  labels:
+    app: green-httpd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: green-httpd
+  template:
+    metadata:
+      labels:
+        app: green-httpd
+    spec:
+      containers:
+        - image: httpd
+          name: green-httpd
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-green
+  labels:
+    app: green-httpd
+spec:
+  type:
+    NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: green-httpd

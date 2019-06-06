@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deployment-blue
+  labels:
+    app: blue-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blue-nginx
+  template:
+    metadata:
+      labels:
+        app: blue-nginx
+    spec:
+      containers:
+        - image: nginx
+          name: blue-nginx
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-blue
+  labels:
+    app: blue-nginx
+spec:
+  type:
+    NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: blue-nginx

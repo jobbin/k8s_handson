@@ -1,0 +1,22 @@
+ apiVersion: extensions/v1beta1
+ kind: Ingress
+ metadata:
+   name: ingress
+   annotations:
+   # nginx.ingress.kubernetes.io/service-weight:|
+   #   <new-svc-name>:<new-svc-weight>, <old-svc-name>:<old-svc-weight>
+    nginx.ingress.kubernetes.io/service-weight: |
+      service-blue: 50, service-green: 50
+ spec:
+   rules:
+   - host: bg-test.io
+     http:
+       paths:
+       - path: /
+         backend:
+           serviceName: service-blue
+           servicePort: 80
+       - path: /
+         backend:
+           serviceName: service-green
+           servicePort: 80
